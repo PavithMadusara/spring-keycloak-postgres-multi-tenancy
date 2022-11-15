@@ -1,0 +1,51 @@
+keycloak:
+  realm: ${AUTH_REALM}
+  resource: ${AUTH_RESOURCE}
+  auth-server-url: ${AUTH_SERVER}
+  credentials:
+    secret: ${AUTH_SECRET}
+  bearer-only: true
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ${keycloak.resource}
+            client-secret: ${keycloak.credentials.secret}
+            authorization-grant-type: client_credentials
+        provider:
+          keycloak:
+            token-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
+  liquibase:
+    enabled: true
+    change-log: classpath:db/db.changelog-master.xml
+
+multitenancy:
+  master:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/example
+      username: postgres
+      password: password
+  tenant:
+    datasource:
+      url: ${multitenancy.master.datasource.url}
+      username: service
+      password: service
+
+global:
+  datasource:
+    truststore:
+      location: /tmp/postgre.jks
+      password:
+      content:
+      type: JKS
+
