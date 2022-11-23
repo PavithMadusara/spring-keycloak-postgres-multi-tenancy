@@ -1,15 +1,11 @@
-package com.aupma.postgresstenant.config.multitenancy;
+package com.aupma.postgresstenant.config.auditor;
 
 import java.util.Date;
 
 /**
  * @author Pavith Madusara
  */
-public interface TenantAuditorAware {
-
-    Integer getTenantId();
-
-    void setTenantId(Integer tenantId);
+public interface AuditorAware {
 
     void setCreatedAt(Date createdAt);
 
@@ -18,5 +14,7 @@ public interface TenantAuditorAware {
     void setCreatedBy(String createdBy);
 
     void setUpdatedBy(String updatedBy);
+
+    void setDeletedBy(String deletedBy);
 
 }

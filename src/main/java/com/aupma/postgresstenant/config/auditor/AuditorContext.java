@@ -1,4 +1,4 @@
-package com.aupma.postgresstenant.config.multitenancy;
+package com.aupma.postgresstenant.config.auditor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
@@ -16,13 +16,7 @@ public final class AuditorContext {
         if (securityContext != null && securityContext.getAuthentication() != null) {
             Object principal = securityContext.getAuthentication().getPrincipal();
             if (principal instanceof KeycloakPrincipal<?> keycloakPrincipal) {
-                String userId = keycloakPrincipal.getKeycloakSecurityContext().getToken().getId();
-                if (userId != null) {
-                    return userId;
-                } else {
-                    log.error("TenantId is not an Integer");
-                    throw new RuntimeException("TenantId is not an Integer or null");
-                }
+                return keycloakPrincipal.getKeycloakSecurityContext().getToken().getId();
             } else {
                 log.warn("Principal is not KeycloakPrincipal");
                 throw new RuntimeException("Principal is not KeycloakPrincipal");

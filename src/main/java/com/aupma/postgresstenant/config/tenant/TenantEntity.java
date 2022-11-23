@@ -1,7 +1,5 @@
-package com.aupma.postgresstenant.entity;
+package com.aupma.postgresstenant.config.tenant;
 
-import com.aupma.postgresstenant.config.multitenancy.TenantAuditorAware;
-import com.aupma.postgresstenant.config.multitenancy.TenantEntityListener;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -19,7 +17,7 @@ import java.util.Date;
 @Setter
 @MappedSuperclass
 @EntityListeners({TenantEntityListener.class})
-public abstract class BaseEntity implements TenantAuditorAware {
+public abstract class TenantEntity implements TenantAuditorAware {
     @Column
     private Integer tenantId;
 
@@ -36,5 +34,12 @@ public abstract class BaseEntity implements TenantAuditorAware {
     @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
     protected Date updatedAt;
+
+    @Column
+    private String deletedBy;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
 
 }

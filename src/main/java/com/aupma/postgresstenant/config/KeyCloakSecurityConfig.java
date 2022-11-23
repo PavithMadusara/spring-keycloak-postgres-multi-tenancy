@@ -1,5 +1,6 @@
 package com.aupma.postgresstenant.config;
 
+import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.client.KeycloakClientRequestFactory;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,12 +28,12 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(jsr250Enabled = true)
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(jsr250Enabled = true, securedEnabled = true, prePostEnabled = true)
 @ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 public class KeyCloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
-    @Autowired
-    public KeycloakClientRequestFactory keycloakClientRequestFactory;
+    public final KeycloakClientRequestFactory keycloakClientRequestFactory;
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -44,9 +46,11 @@ public class KeyCloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
+
         http.authorizeRequests()
-                .anyRequest()
-                .authenticated();
+                .antMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+                .anyRequest().authenticated();
+
         http.csrf().disable();
     }
 

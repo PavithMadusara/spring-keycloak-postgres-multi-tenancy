@@ -7,6 +7,8 @@ keycloak:
   bearer-only: true
 
 spring:
+  application:
+    name: skpmt
   jpa:
     hibernate:
       ddl-auto: none
@@ -29,23 +31,15 @@ spring:
     enabled: true
     change-log: classpath:db/db.changelog-master.xml
 
-multitenancy:
+tenancy:
   master:
     datasource:
-      url: jdbc:postgresql://localhost:5432/example
-      username: postgres
-      password: password
+      url: ${JDBC_DATABASE_URL:jdbc:postgresql://postgres/${spring.application.name}_module?serverTimezone=UTC}
+      username: ${MASTER_DATASOURCE_USERNAME:postgres}
+      password: ${MASTER_DATASOURCE_PASSWORD:aupma}
   tenant:
     datasource:
-      url: ${multitenancy.master.datasource.url}
-      username: service
-      password: service
-
-global:
-  datasource:
-    truststore:
-      location: /tmp/postgre.jks
-      password:
-      content:
-      type: JKS
+      url: ${tenancy.master.datasource.url}
+      username: ${TENANT_DATASOURCE_USERNAME:${spring.application.name}}
+      password: ${TENANT_DATASOURCE_PASSWORD:${spring.application.name}}
 

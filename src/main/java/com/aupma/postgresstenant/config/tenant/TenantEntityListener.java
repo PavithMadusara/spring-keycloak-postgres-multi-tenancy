@@ -1,4 +1,7 @@
-package com.aupma.postgresstenant.config.multitenancy;
+package com.aupma.postgresstenant.config.tenant;
+
+
+import com.aupma.postgresstenant.config.auditor.AuditorContext;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
@@ -32,6 +35,7 @@ public class TenantEntityListener {
     public void preRemove(Object entity) {
         if (entity instanceof TenantAuditorAware tenantAuditorAware) {
             tenantAuditorAware.setTenantId(TenantContext.getTenantId());
+            tenantAuditorAware.setDeletedBy(AuditorContext.getCurrentUser());
         }
     }
 }

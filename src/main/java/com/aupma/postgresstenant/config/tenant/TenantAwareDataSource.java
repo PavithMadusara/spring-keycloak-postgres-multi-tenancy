@@ -1,7 +1,8 @@
-package com.aupma.postgresstenant.config.multitenancy;
+package com.aupma.postgresstenant.config.tenant;
 
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.springframework.jdbc.datasource.DelegatingDataSource;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.sql.DataSource;
@@ -11,6 +12,7 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 
 
 /**
@@ -22,27 +24,29 @@ public class TenantAwareDataSource extends DelegatingDataSource {
         super(targetDataSource);
     }
 
+    @NonNull
     @Override
     public Connection getConnection() throws SQLException {
-        final Connection connection = getTargetDataSource().getConnection();
+        final Connection connection = Objects.requireNonNull(getTargetDataSource()).getConnection();
         setTenantId(connection);
         return getTenantAwareConnectionProxy(connection);
     }
 
+    @NonNull
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
-        final Connection connection = getTargetDataSource().getConnection(username, password);
+    public Connection getConnection(@NonNull String username, @NonNull String password) throws SQLException {
+        final Connection connection = Objects.requireNonNull(getTargetDataSource()).getConnection(username, password);
         setTenantId(connection);
         return getTenantAwareConnectionProxy(connection);
     }
 
-    // Every time the app asks the data source for a connection, set the PostgreSQL session
-    // variable to the tenant id to enforce data isolation.
-    private void setTenantId(Connection connection) throws SQLException {
+    // Every time the app asks the auditor source for a connection, set the PostgreSQL session
+    // variable to the tenant id to enforce auditor isolation.
+    private void setTenantId(Connection connection) {
         try (Statement sql = connection.createStatement()) {
             Integer tenantId = TenantContext.getTenantId();
             sql.execute("SET app.tenant_id TO '" + tenantId + "'");
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -80,13 +84,13 @@ public class TenantAwareDataSource extends DelegatingDataSource {
                 case "toString":
                     return "Tenant-aware proxy for target Connection [" + this.target.toString() + "]";
                 case "unwrap":
-                    if (((Class) args[0]).isInstance(proxy)) {
+                    if (((Class<?>) args[0]).isInstance(proxy)) {
                         return proxy;
                     } else {
                         return method.invoke(target, args);
                     }
                 case "isWrapperFor":
-                    if (((Class) args[0]).isInstance(proxy)) {
+                    if (((Class<?>) args[0]).isInstance(proxy)) {
                         return true;
                     } else {
                         return method.invoke(target, args);

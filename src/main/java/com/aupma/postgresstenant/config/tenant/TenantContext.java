@@ -1,4 +1,4 @@
-package com.aupma.postgresstenant.config.multitenancy;
+package com.aupma.postgresstenant.config.tenant;
 
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
